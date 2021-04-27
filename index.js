@@ -168,7 +168,7 @@ const viewDepartments = () => {
 };
 
 const viewRoles = () => {
-  connection.query('SELECT * FROM role', (err, res) => {
+  connection.query('SELECT * FROM role INNER JOIN department ON (role.department_id = department.id)', (err, res) => {
     if (err) throw err;
     // Log all results of the SELECT statement
     console.table(res);
@@ -177,10 +177,43 @@ const viewRoles = () => {
 };
 
 const viewEmployees = () => {
-  connection.query('SELECT * FROM employee', (err, res) => {
+  connection.query('SELECT * FROM employee INNER JOIN role ON (employee.role_id = role.id) ', (err, res) => {
     if (err) throw err;
     // Log all results of the SELECT statement
     console.table(res);
     start();
+  });
+};
+
+const updateRoles = () => {
+  inquirer.prompt([
+    {
+      name: 'empId',
+      type: 'input',
+      message: 'What is the ID number of the employee you would like to update?'
+    },
+    {
+      name: 'newRoleId',
+      type: 'input',
+      message: 'What is the employee\'s new role ID?'
+    }
+  ]).then((answer) => {
+
+    const query = connection.query(
+      'UPDATE employee SET ? WHERE ?',
+      [
+        {
+          role_id: answer.newRoleId
+        },
+        {
+          id: answer.empId
+        }
+      ],
+      (err, res) => {
+        if (err) throw err;
+        console.log('Employee Updated');  
+        start();
+      }
+    );
   });
 };
